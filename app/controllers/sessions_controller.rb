@@ -3,7 +3,7 @@ class SessionsController < ApplicationController
 
   # GET /sessions
   def index
-    @sessions = Session.select("id, title").all
+    @sessions = Session.select("id, title, description, track, source").all
 
     render json: @sessions.to_json
   end
