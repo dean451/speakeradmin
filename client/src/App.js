@@ -1,28 +1,83 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
+import { Container, Header, Segment, Button, Icon, Dimmer, Loader, Divider } from 'semantic-ui-react'
 
 class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
+  constructor () {
+    super()
+    this.state = {}
+    this.getSessions = this.getSessions.bind(this)
+    this.getSession = this.getSession.bind(this)
+  }
+
+  componentDidMount () {
+    this.getSessions()
+  }
+
+  fetch (endpoint) {
+    return window.fetch(endpoint)
+      .then(response => response.json())
+      .catch(error => console.log(error))
+  }
+
+  getSessions () {
+    this.fetch('/api/sessions')
+      .then(sessions => {
+        if (sessions.length) {
+          this.setState({sessions: sessions})
+          this.getSession(sessions[0].id)
+        } else {
+          this.setState({sessions: []})
+        }
+      })
+  }
+
+  getSession (id) {
+    this.fetch(`/api/sessions/${id}`)
+      .then(session => this.setState({session: session}))
+  }
+
+  render () {
+    let {sessions, session} = this.state
+    return sessions
+      ? <Container text>
+        <Header as='h2' icon textAlign='center' color='teal'>
+          <Icon name='unordered list' circular />
+          <Header.Content>
+            List of Sessions
+          </Header.Content>
+        </Header>
+        <Divider hidden section />
+        {sessions && sessions.length
+          ? <Button.Group color='teal' fluid widths={sessions.length}>
+            {Object.keys(sessions).map((key) => {
+              return <Button active={session && session.id === sessions[key].id} fluid key={key} onClick={() => this.getSession(sessions[key].id)}>
+                {sessions[key].title}
+              </Button>
+            })}
+          </Button.Group>
+          : <Container textAlign='center'>No sessions found.</Container>
+        }
+        <Divider section />
+        {session &&
+          <Container>
+            <Header as='h2'>{session.title}</Header>
+            {session.description && <p>{session.description}</p>}
+            {session.ingredients &&
+              <Segment.Group>
+                {session.ingredients.map((ingredient, i) => <Segment key={i}>{ingredient.description}</Segment>)}
+              </Segment.Group>
+            }
+            {session.steps && <p>{session.steps}</p>}
+            {session.source && <Button basic size='tiny' color='teal' target="_blank" href={session.source}>Source</Button>}
+          </Container>
+        }
+      </Container>
+      : <Container text>
+        <Dimmer active inverted>
+          <Loader content='Loading' />
+        </Dimmer>
+      </Container>
   }
 }
 
-export default App;
+export default App
