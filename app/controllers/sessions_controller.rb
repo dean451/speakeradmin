@@ -3,14 +3,15 @@ class SessionsController < ApplicationController
 
   # GET /sessions
   def index
-    @sessions = Session.all
+    @sessions = Session.select("id, title").all
 
-    render json: @sessions
+    render json: @sessions.to_json
   end
 
   # GET /sessions/1
   def show
-    render json: @session
+    @session = Session.find(params[:id])
+    render json: @session.to_json(:include => {:speakers => {:only => [:id, :name] }})
   end
 
   # POST /sessions
