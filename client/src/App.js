@@ -61,13 +61,14 @@ class App extends Component {
         {session &&
           <Container>
             <Header as='h2'>{session.title}</Header>
+            <Header as='h3'>{session.track && <p>{session.track}</p>}</Header>
             {session.description && <p>{session.description}</p>}
-            {session.ingredients &&
+            Speakers:
+            {session.speakers &&
               <Segment.Group>
-                {session.ingredients.map((ingredient, i) => <Segment key={i}>{ingredient.description}</Segment>)}
+                {session.speakers.map((speaker, i) => <Segment key={i}>{speaker.name}</Segment>)}
               </Segment.Group>
             }
-            {session.steps && <p>{session.steps}</p>}
             {session.source && <Button basic size='tiny' color='teal' target="_blank" href={session.source}>Source</Button>}
           </Container>
         }
